@@ -129,6 +129,11 @@ function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
 
   for (let i = 0; i < arquivos.length; i++) {
     const arquivo = arquivos[i];
+
+    if (arquivo.startsWith("node_modules")) {
+      continue;
+    }
+
     const caminhoCompleto = path.join(pasta, arquivo);
     const caminhoRelativo = path.relative(raiz, caminhoCompleto);
     const stats = fs.statSync(caminhoCompleto);

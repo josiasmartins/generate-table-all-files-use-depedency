@@ -94,6 +94,31 @@ tr:hover {
   margin-top: 20px;
 }
 
+/* loader */
+.loader {
+  position: absolute;
+  width: 20%;
+  height: 21%;
+  margin-left: 40%;
+}
+
+.loader:before , .loader:after{
+  content: '';
+  border-radius: 50%;
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.3) inset;
+}
+.loader:after {
+  box-shadow: 0 2px 0 #FF3D00 inset;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  0% {  transform: rotate(0)}
+  100% { transform: rotate(360deg)}
+}
+
   </style>
 </head>
 <body>
@@ -124,6 +149,7 @@ tr:hover {
     <tbody>
     </tbody>
   </table>
+  <span class="loader"></span>
 
   <p id="semResultado" style="display:none;">Nenhum resultado encontrado.</p>
 
@@ -131,12 +157,18 @@ tr:hover {
     const form = document.querySelector('form');
     const resultado = document.querySelector('#resultado tbody');
     const semResultado = document.querySelector('#semResultado');
+    const loader = document.querySelector('.loader');
+    
+    loader.style.display = "none";
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
 
       const pasta = document.querySelector('input[name="pasta"]').value;
       const dependencia = document.querySelector('input[name="dependencia"]').value;
+
+      loader.style.display = "block";
+      resultado.style.display = "none";
 
       fetch('/buscar-dependencia', {
         method: 'POST',
@@ -150,6 +182,8 @@ tr:hover {
       })
       .then(response => response.json())
       .then(data => {
+        loader.style.display = "none";
+        resultado.style.display = "contents";
         console.log(data, "data")
         resultado.innerHTML = '';
         if (data.length) {
