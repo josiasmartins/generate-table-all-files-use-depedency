@@ -4,96 +4,69 @@
   <meta charset="UTF-8">
   <title>Resultado da busca</title>
   <style>
+    body {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  color: #333;
+  background-color: #f7f7f7;
+}
 
-    /* Fonte para programadores */
-/* @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
-
-body {
-  font-family: 'Ubuntu Mono', monospace;
-} */
-
-    table {
-      border-collapse: collapse;
-      margin: 20px 0;
-      font-size: 1.2rem;
-      width: 100%;
-      text-align: left;
-    }
-    th {
-      background-color: #0077be;
-      color: #fff;
-      font-weight: bold;
-      padding: 10px;
-      text-transform: uppercase;
-    }
-    td {
-      border-bottom: 1px solid #ddd;
-      padding: 10px;
-    }
-    tr:hover {
-      background-color: #f5f5f5;
-    }
-
-    /* Estilo Glassmorphism */
-body {
-  background-color: #f2f3f4;
+h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin: 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #0077be;
 }
 
 form {
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(5.5px);
-  -webkit-backdrop-filter: blur(5.5px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  margin: 20px;
-  padding: 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
 label {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-input[type="text"],
-button {
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.3);
-  border: none;
-  color: #fff;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 1.2rem;
 }
 
 input[type="text"] {
-  flex-grow: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
 }
 
-button {
+button[type="submit"] {
+  padding: 10px 20px;
+  background-color: #0077be;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: #0077be;
-  margin-left: 10px;
-  width: 150px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 10px;
 }
 
-button:hover {
-  transform: scale(1.1);
-  background-color: #005b91;
+button[type="submit"]:hover {
+  background-color: #004f80;
 }
 
-/* Estilo da tabela */
 table {
   border-collapse: collapse;
   margin: 20px 0;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   width: 100%;
   text-align: left;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 th {
@@ -113,15 +86,12 @@ tr:hover {
   background-color: #f5f5f5;
 }
 
-/* Estilo da mensagem de sem resultado */
 #semResultado {
-  font-size: 2rem;
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  padding: 10px;
+  display: none;
+  color: red;
+  font-weight: bold;
   text-align: center;
-  margin: 20px;
+  margin-top: 20px;
 }
 
   </style>
