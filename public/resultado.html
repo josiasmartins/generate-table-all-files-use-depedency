@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Resultado da busca</title>
+</head>
+<body>
+  <h1>Resultado da busca</h1>
+
+  <form>
+    <label>
+      Pasta:
+      <input type="text" name="pasta" required>
+    </label>
+
+    <label>
+      Dependência:
+      <input type="text" name="dependencia" required>
+    </label>
+
+    <button type="submit" id="buscar">Buscar</button>
+  </form>
+
+  <table id="resultado">
+    <thead>
+      <tr>
+        <th>Arquivo</th>
+        <th>Caminho relativo</th>
+        <th>Linha</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <p id="semResultado" style="display:none;">Nenhum resultado encontrado.</p>
+
+  <script>
+    const form = document.querySelector('form');
+    const resultado = document.querySelector('#resultado tbody');
+    const semResultado = document.querySelector('#semResultado');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const pasta = document.querySelector('input[name="pasta"]').value;
+      const dependencia = document.querySelector('input[name="dependencia"]').value;
+
+      fetch('/buscar-dependencia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          pasta: pasta,
+          dependencia: dependencia
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        resultado.innerHTML = '';
+        if (data.length) {
+          semResultado.style.display = 'none';
+          data.forEach(item => {
+            resultado.innerHTML += `
+              <tr>
+                <td>${item.nomeArquivo}</td>
+                <td>${item.caminhoRelativo}</td>
+                <td>${item.linha}</td>
+              </tr>
+            `;
+          });
+        } else {
+          semResultado.style.display = 'block';
+        }
+      })
+      .catch(error => console.error(error));
+    });
+  </script>
+</body>
+</html>
