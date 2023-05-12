@@ -144,12 +144,15 @@ function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
     } else {
       const linhas = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' }).split('\n');
       for (let j = 0; j < linhas.length; j++) {
-        const linha = linhas[j];
+
+
+        let linha = linhas[j];
         if (linha.includes(dependencia)) {
+          linha = filterOnlyClass(linha);
           const objeto = {
             nomeArquivo: arquivo,
+            linha: linha,
             caminhoRelativo: caminhoRelativo,
-            linha: j + 1,
           };
           console.log(objeto, "OBJETO");
           resultados.push(objeto);
@@ -163,6 +166,36 @@ function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
   console.log(`Busca concluída na pasta ${pasta}`);
   return resultados;
 }
+
+// function filterOnlyClass(words) {
+//   const onlyClass = /\{([^]*)}/g;
+//   const removeSpace = /\s/g;
+//   console.log(words);
+
+//   if (onlyClass.test(words)) {
+//     console.log("OI")
+//     return words.replace(removeSpace, '')
+//       .match(onlyClass)[1]
+//       .split(',');
+//   }
+
+
+//   return words;
+
+// }
+
+function filterOnlyClass(words) {
+  const onlyClass = /\{([\s\S]*?)\}/;
+  const removeSpace = /\s/g;
+
+  if (onlyClass.test(words)) {
+    const classList = words.match(onlyClass)[1];
+    return classList.replace(removeSpace, '').split(',');
+  }
+
+  return [];
+}
+
 
 
 

@@ -97,7 +97,7 @@ tr:hover {
 /* loader */
 .loader {
   position: absolute;
-  width: 20%;
+  width: 9.5rem;
   height: 21%;
   margin-left: 40%;
 }
@@ -117,6 +117,41 @@ tr:hover {
 @keyframes rotate {
   0% {  transform: rotate(0)}
   100% { transform: rotate(360deg)}
+}
+
+@media screen and (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  tr {
+    border: 1px solid #ccc;
+  }
+  
+  td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+  }
+  
+  td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    content: attr(data-column);
+    color: #000;
+    font-weight: bold;
+  }
 }
 
   </style>
@@ -142,8 +177,8 @@ tr:hover {
     <thead>
       <tr>
         <th>Arquivo</th>
+        <th>Classe da dependencia</th>
         <th>Caminho relativo</th>
-        <th>Linha(s)</th>
       </tr>
     </thead>
     <tbody>
@@ -183,7 +218,12 @@ tr:hover {
       .then(response => response.json())
       .then(data => {
         loader.style.display = "none";
+        
+        
         resultado.style.display = "contents";
+
+        totalClass(data)
+
         console.log(data, "data")
         resultado.innerHTML = '';
         if (data.length) {
@@ -192,8 +232,8 @@ tr:hover {
             resultado.innerHTML += `
               <tr>
                 <td>${item.nomeArquivo}</td>
-                <td>${item.caminhoRelativo}</td>
                 <td>${item.linha}</td>
+                <td>${item.caminhoRelativo}</td>
               </tr>
             `;
           });
@@ -203,6 +243,52 @@ tr:hover {
       })
       .catch(error => console.error(error));
     });
+
+    function totalClass(data) {
+  const result = {};
+  data.forEach(obj => {
+    obj.linha.forEach(str => {
+      result[str] = (result[str] || 0) + 1;
+    });
+  });
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const tbody = document.createElement('tbody');
+
+  // Cabeçalho da tabela
+  const headerRow = document.createElement('tr');
+  const headerCol1 = document.createElement('th');
+  headerCol1.innerText = 'Linha';
+  const headerCol2 = document.createElement('th');
+  headerCol2.innerText = 'Quantidade';
+
+  headerRow.appendChild(headerCol1);
+  headerRow.appendChild(headerCol2);
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  // Corpo da tabela
+  Object.keys(result).forEach(key => {
+    const bodyRow = document.createElement('tr');
+    const bodyCol1 = document.createElement('td');
+    bodyCol1.innerText = key;
+    const bodyCol2 = document.createElement('td');
+    bodyCol2.innerText = result[key];
+
+    bodyRow.appendChild(bodyCol1);
+    bodyRow.appendChild(bodyCol2);
+
+    tbody.appendChild(bodyRow);
+  });
+
+  table.appendChild(tbody);
+
+  document.body.appendChild(table);
+}
+
+
   </script>
 </body>
 </html>
