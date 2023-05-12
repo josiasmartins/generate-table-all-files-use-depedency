@@ -88,17 +88,53 @@ app.listen(port, () => {
 
 
 
-function buscarDependenciaSync(pasta, dependencia) {
+// function buscarDependenciaSync(pasta, dependencia) {
+//   const arquivos = fs.readdirSync(pasta);
+//   const resultados = [];
+
+//   for (let i = 0; i < arquivos.length; i++) {
+//     const arquivo = arquivos[i];
+//     const caminhoCompleto = path.join(pasta, arquivo);
+//     const stats = fs.statSync(caminhoCompleto);
+
+//     if (stats.isDirectory()) {
+//       const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia);
+//       resultados.push(...subresultados);
+//     } else {
+//       const linhas = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' }).split('\n');
+//       for (let j = 0; j < linhas.length; j++) {
+//         const linha = linhas[j];
+//         if (linha.includes(dependencia)) {
+//           const objeto = {
+//             nomeArquivo: arquivo,
+//             caminhoRelativo: path.relative(pasta, caminhoCompleto),
+//             linha: j + 1,
+//           };
+//           console.log(objeto, "OBJETO");
+//           resultados.push(objeto);
+//           break;
+//         }
+//       }
+//     }
+//   }
+
+//   console.log(resultados, "RS");
+//   console.log(`Busca concluída na pasta ${pasta}`);
+//   return resultados;
+// }
+
+function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
   const arquivos = fs.readdirSync(pasta);
   const resultados = [];
 
   for (let i = 0; i < arquivos.length; i++) {
     const arquivo = arquivos[i];
     const caminhoCompleto = path.join(pasta, arquivo);
+    const caminhoRelativo = path.relative(raiz, caminhoCompleto);
     const stats = fs.statSync(caminhoCompleto);
 
     if (stats.isDirectory()) {
-      const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia);
+      const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia, raiz);
       resultados.push(...subresultados);
     } else {
       const linhas = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' }).split('\n');
@@ -107,7 +143,7 @@ function buscarDependenciaSync(pasta, dependencia) {
         if (linha.includes(dependencia)) {
           const objeto = {
             nomeArquivo: arquivo,
-            caminhoRelativo: path.relative(pasta, caminhoCompleto),
+            caminhoRelativo: caminhoRelativo,
             linha: j + 1,
           };
           console.log(objeto, "OBJETO");
@@ -122,3 +158,6 @@ function buscarDependenciaSync(pasta, dependencia) {
   console.log(`Busca concluída na pasta ${pasta}`);
   return resultados;
 }
+
+
+
