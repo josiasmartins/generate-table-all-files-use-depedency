@@ -1,11 +1,11 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const html = require('html');
-const readline = require('readline');
+// const html = require('html');
+// const readline = require('readline');
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,7 +22,7 @@ app.post('/buscar-dependencia', (req, res) => {
   const dependencia = req.body.dependencia;
 
   const resultados = buscarDependenciaSync(pasta, dependencia);
-  
+    
   res.header("Access-Control-Allow-Origin", "*");
   res.json(resultados);
   console.log(resultados, "IBAG THEN");
@@ -130,7 +130,7 @@ function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
   for (let i = 0; i < arquivos.length; i++) {
     const arquivo = arquivos[i];
 
-    if (arquivo.startsWith("node_modules")) {
+    if (arquivo.startsWith("node_modules") || arquivo.startsWith('.git') || arquivo.startsWith('coverage')) {
       continue;
     }
 
