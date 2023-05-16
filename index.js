@@ -1,10 +1,11 @@
 const express = require('express');
-const path = require('path')
+const path = require('path');
 const fs = require('fs');
-const html = require('html');
+// const html = require('html');
+// const readline = require('readline');
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -16,67 +17,185 @@ app.get('/', (req, res) => {
   console.log("CLIENTE")
 });
 
-// app.post('/buscar-dependencia', (req, res) => {
-//   const pasta = req.body.pasta;
-//   const dependencia = req.body.dependencia;
-
-//   console.log(pasta, dependencia, " depdendencia");
-
-//   const resultado = buscarDependencia(pasta, dependencia);
-
-//   console.log(resultado);
-
-//   res.render('resultado.html', { resultado });
-// });
-
 app.post('/buscar-dependencia', (req, res) => {
   const pasta = req.body.pasta;
   const dependencia = req.body.dependencia;
 
-  console.log(pasta, dependencia, " depdendencia");
-
-  const resultado = buscarDependencia(pasta, dependencia);
-
-  console.log(resultado);
-
-  res.sendFile(path.join(__dirname, 'public', 'resultado.html'));
+  const resultados = buscarDependenciaSync(pasta, dependencia);
+    
+  res.header("Access-Control-Allow-Origin", "*");
+  res.json(resultados);
+  console.log(resultados, "IBAG THEN");
 });
 
 app.listen(port, () => {
   console.log(`Servidor escutando na porta ${port}`)
 });
 
-function buscarDependencia(pasta, dependencia) {
-  const resultado = [];
 
-  function buscarRecursivamente(pastaAtual) {
-    const arquivos = fs.readdirSync(pastaAtual);
 
-    arquivos.forEach(arquivo => {
-      const caminhoCompleto = path.join(pastaAtual, arquivo);
-      const stat = fs.statSync(caminhoCompleto);
+// function buscarDependenciaSync(pasta, dependencia) {
+//   const arquivos = fs.readdirSync(pasta);
+//   const resultados = [];
 
-      if (stat.isDirectory()) {
-        buscarRecursivamente(caminhoCompleto);
-      } else if (stat.isFile()) {
-        const conteudoArquivo = fs.readFileSync(caminhoCompleto, 'utf-8');
-        const linhas = conteudoArquivo.split('\n');
+//   for (let i = 0; i < arquivos.length; i++) {
+//     const arquivo = arquivos[i];
+//     const caminhoCompleto = path.join(pasta, arquivo);
+//     const stats = fs.statSync(caminhoCompleto);
 
-        linhas.forEach((linha, index) => {
-          if (linha.includes(dependencia)) {
-            resultado.push({
-              nomeArquivo: arquivo,
-              caminhoRelativo: path.relative(pasta, caminhoCompleto),
-              linha: index + 1
-            });
-          }
-        });
+//     if (stats.isDirectory()) {
+//       const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia);
+//       resultados.push(...subresultados);
+//     } else {
+//       const texto = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' });
+//       let linhas = [];
+//       let linhaAtual = 1;
+//       let ultimaPosicao = -1;
+      
+//       while (true) {
+//         const posicao = texto.indexOf(dependencia, ultimaPosicao + 1);
+//         if (posicao === -1) {
+//           break;
+//         }
+//         if (ultimaPosicao === -1) {
+//           linhas.push(linhaAtual);
+//         } else if (linhaAtual !== linhas[linhas.length - 1]) {
+//           linhas.push(linhaAtual);
+//         }
+//         ultimaPosicao = posicao;
+//         while (texto[ultimaPosicao - 1] !== '\n' && ultimaPosicao > 0) {
+//           ultimaPosicao--;
+//         }
+//         linhaAtual = texto.slice(0, ultimaPosicao).split('\n').length;
+//       }
+      
+//       if (linhas.length > 0) {
+//         const objeto = {
+//           nomeArquivo: arquivo,
+//           caminhoRelativo: path.relative(pasta, caminhoCompleto),
+//           linha: linhas.join(', '),
+//         };
+//         console.log(objeto, "OBJETO");
+//         resultados.push(objeto);
+//       }
+//     }
+//   }
+
+//   console.log(resultados, "RS");
+//   console.log(`Busca concluída na pasta ${pasta}`);
+//   return resultados;
+// }
+
+
+
+// function buscarDependenciaSync(pasta, dependencia) {
+//   const arquivos = fs.readdirSync(pasta);
+//   const resultados = [];
+
+//   for (let i = 0; i < arquivos.length; i++) {
+//     const arquivo = arquivos[i];
+//     const caminhoCompleto = path.join(pasta, arquivo);
+//     const stats = fs.statSync(caminhoCompleto);
+
+//     if (stats.isDirectory()) {
+//       const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia);
+//       resultados.push(...subresultados);
+//     } else {
+//       const linhas = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' }).split('\n');
+//       for (let j = 0; j < linhas.length; j++) {
+//         const linha = linhas[j];
+//         if (linha.includes(dependencia)) {
+//           const objeto = {
+//             nomeArquivo: arquivo,
+//             caminhoRelativo: path.relative(pasta, caminhoCompleto),
+//             linha: j + 1,
+//           };
+//           console.log(objeto, "OBJETO");
+//           resultados.push(objeto);
+//           break;
+//         }
+//       }
+//     }
+//   }
+
+//   console.log(resultados, "RS");
+//   console.log(`Busca concluída na pasta ${pasta}`);
+//   return resultados;
+// }
+
+function buscarDependenciaSync(pasta, dependencia, raiz = pasta) {
+  const arquivos = fs.readdirSync(pasta);
+  const resultados = [];
+
+  for (let i = 0; i < arquivos.length; i++) {
+    const arquivo = arquivos[i];
+
+    if (arquivo.startsWith("node_modules") || arquivo.startsWith('.git') || arquivo.startsWith('coverage')) {
+      continue;
+    }
+
+    const caminhoCompleto = path.join(pasta, arquivo);
+    const caminhoRelativo = path.relative(raiz, caminhoCompleto);
+    const stats = fs.statSync(caminhoCompleto);
+
+    if (stats.isDirectory()) {
+      const subresultados = buscarDependenciaSync(caminhoCompleto, dependencia, raiz);
+      resultados.push(...subresultados);
+    } else {
+      const linhas = fs.readFileSync(caminhoCompleto, { encoding: 'utf-8' }).split('\n');
+      for (let j = 0; j < linhas.length; j++) {
+
+
+        let linha = linhas[j];
+        if (linha.includes(dependencia)) {
+          linha = filterOnlyClass(linha);
+          const objeto = {
+            nomeArquivo: arquivo,
+            linha: linha,
+            caminhoRelativo: caminhoRelativo,
+          };
+          console.log(objeto, "OBJETO");
+          resultados.push(objeto);
+          break;
+        }
       }
-    });
+    }
   }
 
-  buscarRecursivamente(pasta);
-
-  console.log(resultado);
-  return resultado;
+  console.log(resultados, "RS");
+  console.log(`Busca concluída na pasta ${pasta}`);
+  return resultados;
 }
+
+// function filterOnlyClass(words) {
+//   const onlyClass = /\{([^]*)}/g;
+//   const removeSpace = /\s/g;
+//   console.log(words);
+
+//   if (onlyClass.test(words)) {
+//     console.log("OI")
+//     return words.replace(removeSpace, '')
+//       .match(onlyClass)[1]
+//       .split(',');
+//   }
+
+
+//   return words;
+
+// }
+
+function filterOnlyClass(words) {
+  const onlyClass = /\{([\s\S]*?)\}/;
+  const removeSpace = /\s/g;
+
+  if (onlyClass.test(words)) {
+    const classList = words.match(onlyClass)[1];
+    return classList.replace(removeSpace, '').split(',');
+  }
+
+  return [];
+}
+
+
+
+
